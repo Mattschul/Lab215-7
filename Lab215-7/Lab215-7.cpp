@@ -1,5 +1,5 @@
 // Lab215-7.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
+//By Matt Schuler for CGT215 Fall 2024, SFPhysics practice
 
 #include <iostream>
 #include <SFML/Graphics.hpp>
@@ -14,18 +14,18 @@ int main()
 {
 	// Create our window and world with gravity 0,1
 	RenderWindow window(VideoMode(800, 600), "Bounce");
-	World world(Vector2f(0, 1));
-
+	World world(Vector2f(0, 0));
 
 	// Create the ball
 	PhysicsCircle ball;
-	ball.setCenter(Vector2f(400, 300));
+	ball.setCenter(Vector2f(200, 300));
 	ball.setRadius(20);
+	ball.applyImpulse(Vector2f(0.4, 0.9));
 	world.AddPhysicsBody(ball);
 	
 	// Create the floor
 	PhysicsRectangle floor;
-	floor.setSize(Vector2f(800, 20));
+	floor.setSize(Vector2f(760, 20));
 	floor.setCenter(Vector2f(400, 590));
 	floor.setStatic(true);
 	world.AddPhysicsBody(floor);
@@ -46,27 +46,43 @@ int main()
 
 	//Create a ceiling
 	PhysicsRectangle ceiling;
-	ceiling.setSize(Vector2f(800, 20));
+	ceiling.setSize(Vector2f(760, 20));
 	ceiling.setCenter(Vector2f(400, 10));
 	ceiling.setStatic(true);
 	world.AddPhysicsBody(ceiling);
 
 	//Create a center block
 	PhysicsRectangle block;
-	block.setSize(Vector2f(35, 35));
+	block.setSize(Vector2f(50, 50));
 	block.setCenter(Vector2f(400, 300));
 	block.setStatic(true);
 	world.AddPhysicsBody(block);
 
-
+	//count bangs for center square
 	int bangCount(0);
 	block.onCollision = [&bangCount](PhysicsBodyCollisionResult result) {
 		cout << "bang " << bangCount << endl;
 		bangCount++;
 		};
 
+	//count thuds for bounds
 	int thudCount(0);
 	floor.onCollision = [&thudCount](PhysicsBodyCollisionResult result) {
+		cout << "thud " << thudCount << endl;
+		thudCount++;
+		};
+
+	ceiling.onCollision = [&thudCount](PhysicsBodyCollisionResult result) {
+		cout << "thud " << thudCount << endl;
+		thudCount++;
+		};
+
+	rightwall.onCollision = [&thudCount](PhysicsBodyCollisionResult result) {
+		cout << "thud " << thudCount << endl;
+		thudCount++;
+		};
+
+	leftwall.onCollision = [&thudCount](PhysicsBodyCollisionResult result) {
 		cout << "thud " << thudCount << endl;
 		thudCount++;
 		};
@@ -78,8 +94,8 @@ int main()
 		Time currentTime(clock.getElapsedTime());
 		Time deltaTime(currentTime - lastTime);
 		int deltaTimeMS(deltaTime.asMilliseconds());
-		if (deltaTimeMS > 9) {
-			world.UpdatePhysics(deltaTimeMS);
+		if (deltaTimeMS > 10) {
+			world.UpdatePhysics(deltaTimeMS,1);
 			lastTime = currentTime;
 		}
 		window.clear(Color(0, 0, 0));
@@ -94,6 +110,7 @@ int main()
 		// end at 3 bangs
 		if (bangCount == 3) {
 			exit(0);
+		
 		}
 	}
 }
